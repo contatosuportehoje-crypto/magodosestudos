@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cronograma de Estudos</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
+
+:root{
+  --bg: #0B1526;
+  --paper: #1C2C4A;
+  --paper-2: #16233D;
+  --ink: #EAF0FA;
+  --ink-soft: #8FA1C4;
+  --line: #2A3B5C;
+  --accent-red: #E2685B;
+  --accent-gold: #E8B84B;
+  --accent-blue: #6FA8DC;
+  --board-bg: #060C18;
+  --board-text: #F2EFE3;
+  --radius: 10px;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(ellipse 700px 500px at 88% -4%, rgba(111,168,220,.20), transparent 65%),
+    radial-gradient(ellipse 600px 400px at 6% 8%, rgba(232,184,75,.07), transparent 60%),
+    var(--bg);
+  color:var(--ink);
+  font-family:'Inter', system-ui, sans-serif;
+  min-height:100vh;
+  padding:32px 16px 64px;
+}
+
+.wrap{max-width:760px;margin:0 auto;}
+
+h1,h2,h3{font-family:'Fraunces', Georgia, serif; margin:0; letter-spacing:-0.01em;}
+h1{font-size:clamp(28px,5vw,40px); font-weight:700;}
+h2{font-size:22px; font-weight:600;}
+.eyebrow{
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--accent-gold);
+  font-weight:600;
+}
+
+.header{margin-bottom:28px;}
+.header p{color:var(--ink-soft); margin:8px 0 0; font-size:15px; line-height:1.5;}
+
+.progress{
+  display:flex; gap:6px; margin:20px 0 0;
+}
+.progress span{
+  flex:1; height:4px; border-radius:2px; background:var(--line);
+}
+.progress span.done{background:var(--accent-gold);}
+
+.card{
+  background:var(--paper-2);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:28px;
+  margin-top:20px;
+}
+
+.step-title{margin-bottom:6px;}
+.step-help{color:var(--ink-soft); font-size:14px; margin:4px 0 20px; line-height:1.5;}
+
+label.field-label{
+  display:block; font-size:13px; font-weight:600; color:var(--ink);
+  margin-bottom:8px;
+}
+
+input[type=text], input[type=number], input[type=date]{
+  width:100%;
+  font-family:'Inter',sans-serif;
+  font-size:15px;
+  padding:11px 12px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--paper-2);
+  color:var(--ink);
+}
+input::placeholder{color:var(--ink-soft);}
+input:focus, select:focus, button:focus-visible{
+  outline:2px solid var(--accent-gold); outline-offset:1px;
+}
+
+.row{display:flex; gap:10px; align-items:stretch;}
+.row > *{flex:1;}
+
+select{
+  width:100%; font-family:'Inter',sans-serif; font-size:15px;
+  padding:11px 12px; border:1px solid var(--line); border-radius:8px; background:var(--paper-2); color:var(--ink);
+}
+
+.btn{
+  font-family:'IBM Plex Mono', monospace;
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:.02em;
+  border-radius:8px;
+  border:1px solid transparent;
+  padding:11px 18px;
+  cursor:pointer;
+  transition:transform .08s ease, background .15s ease;
+}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:var(--accent-gold); color:#1B2438;}
+.btn-primary:hover{background:#F2C86B;}
+.btn-primary:disabled{background:#2A3550; color:#6B7A99; cursor:not-allowed;}
+.btn-ghost{background:transparent; color:var(--ink); border-color:var(--line);}
+.btn-ghost:hover{background:var(--paper);}
+.btn-danger{background:transparent; color:var(--accent-red); border-color:var(--accent-red);}
+.btn-danger:hover{background:rgba(226,104,91,.14);}
+.btn-small{padding:7px 12px; font-size:12px;}
+
+.actions{display:flex; justify-content:space-between; margin-top:26px; gap:10px;}
+
+.subject-add{display:flex; gap:8px; margin-bottom:14px;}
+.subject-add input{flex:2;}
+.subject-add select{flex:1;}
+
+.subject-list{display:flex; flex-direction:column; gap:8px;}
+.subject-item{
+  display:flex; align-items:center; justify-content:space-between;
+  border:1px solid var(--line); border-radius:8px; padding:10px 12px;
+  background:var(--paper);
+}
+.subject-item .name{font-weight:600; font-size:14.5px;}
+.subject-item .meta{display:flex; align-items:center; gap:10px;}
+.pill{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; padding:3px 8px;
+  border-radius:20px; font-weight:600; letter-spacing:.03em;
+}
+.pill.w1{background:#233152; color:var(--ink-soft);}
+.pill.w2{background:#4A3B1E; color:#E8C97A;}
+.pill.w3{background:#4A2420; color:#F2A79C;}
+.remove-x{
+  background:none; border:none; color:var(--ink-soft); font-size:18px; cursor:pointer; line-height:1; padding:2px 4px;
+}
+.remove-x:hover{color:var(--accent-red);}
+.empty-hint{color:var(--ink-soft); font-size:13.5px; font-style:italic; padding:8px 0;}
+
+.days-grid{display:flex; flex-wrap:wrap; gap:8px;}
+.day-toggle{
+  font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:13px;
+  padding:10px 0; width:64px; text-align:center;
+  border-radius:8px; border:1.5px solid var(--line); background:var(--paper-2); cursor:pointer;
+  color:var(--ink-soft);
+}
+.day-toggle.active{background:var(--accent-gold); color:#1B2438; border-color:var(--accent-gold);}
+
+.slider-row{display:flex; align-items:center; gap:16px;}
+input[type=range]{flex:1; accent-color: var(--accent-gold);}
+.slider-value{
+  font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:15px; min-width:92px; text-align:right;
+}
+
+.chip-options{display:flex; gap:8px; flex-wrap:wrap;}
+.chip-opt{
+  font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600;
+  padding:9px 16px; border-radius:20px; border:1.5px solid var(--line); background:var(--paper-2); cursor:pointer; color:var(--ink-soft);
+}
+.chip-opt.active{background:var(--accent-blue); color:#0D2036; border-color:var(--accent-blue);}
+
+/* SCHEDULE VIEW */
+.board-banner{
+  background:
+    radial-gradient(ellipse 320px 200px at 88% 0%, rgba(232,184,75,.16), transparent 65%),
+    var(--board-bg);
+  color:var(--board-text);
+  border-radius:var(--radius); padding:22px 24px; margin-top:16px;
+  border:1px solid var(--line);
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+}
+.board-banner .exam{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--accent-gold);}
+.board-banner .exam strong{font-size:15px;}
+
+.week-grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px; margin-top:20px;
+}
+.day-card{
+  background:var(--paper-2); border:1px solid var(--line); border-radius:var(--radius);
+  padding:16px; display:flex; flex-direction:column; gap:10px;
+}
+.day-card.skipped{opacity:.55; background:repeating-linear-gradient(135deg,var(--paper-2),var(--paper-2) 8px,#0F1830 8px,#0F1830 16px);}
+.day-card-head{display:flex; justify-content:space-between; align-items:baseline;}
+.day-card-head .wd{font-family:'Fraunces',serif; font-weight:600; font-size:17px;}
+.day-card-head .dt{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft);}
+.today-tag{
+  font-family:'IBM Plex Mono',monospace; font-size:10px; background:var(--accent-gold); color:#3A2600;
+  padding:2px 6px; border-radius:10px; font-weight:700; letter-spacing:.05em;
+}
+.sessions{display:flex; flex-direction:column; gap:6px;}
+.session{
+  display:flex; flex-direction:column; gap:6px;
+  padding:8px 10px; border-radius:6px; font-size:13px; border-left:4px solid;
+  background:var(--paper);
+}
+.session-top{display:flex; justify-content:space-between; align-items:center;}
+.session.completed .session-name{text-decoration:line-through; color:var(--ink-soft);}
+.session-timer{display:flex; align-items:center; gap:8px;}
+.timer-display{
+  font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600; color:var(--ink-soft);
+  min-width:46px;
+}
+.timer-display.goal-hit{color:var(--accent-gold);}
+.timer-btn{
+  width:26px; height:26px; border-radius:50%; border:1px solid var(--line);
+  background:var(--paper-2); color:var(--ink); font-size:12px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; padding:0;
+  transition:transform .1s ease;
+}
+.timer-btn:active{transform:scale(0.9);}
+.timer-btn:disabled{opacity:.4; cursor:not-allowed;}
+.timer-btn.complete-btn{color:var(--accent-gold); border-color:var(--accent-gold);}
+.timer-btn.complete-btn.is-done{background:var(--accent-gold); color:#1B2438;}
+.mins{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); white-space:nowrap; margin-left:8px;}
+.day-total{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); border-top:1px dashed var(--line); padding-top:8px;}
+.day-actions{display:flex; gap:8px; margin-top:4px;}
+.no-session{color:var(--ink-soft); font-size:13px; font-style:italic;}
+
+.skip-note{
+  font-size:12.5px; color:var(--accent-red); font-family:'IBM Plex Mono',monospace; margin-top:2px;
+}
+
+.bottom-actions{display:flex; justify-content:space-between; margin-top:28px; flex-wrap:wrap; gap:10px;}
+
+.toast{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+  background:#060C18; color:#F2EFE3; padding:12px 20px; border-radius:8px; font-size:13.5px;
+  border:1px solid var(--line);
+  font-family:'Inter',sans-serif; box-shadow:0 8px 24px rgba(0,0,0,.4); opacity:0; pointer-events:none;
+  transition:opacity .25s ease, transform .25s ease; max-width:90vw; text-align:center;
+}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
+
+@media (max-width:480px){
+  .card{padding:20px 16px;}
+  .day-toggle{width:52px; font-size:12px;}
+}
+
+/* ---------- MAGO DECORATIVO ---------- */
+.wizard-corner{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  z-index:500;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:9px;
+}
+.wizard-avatar-btn{
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+  background:none;
+  border:none;
+  padding:0;
+  display:block;
+  animation:wizardFloat 3.6s ease-in-out infinite;
+}
+.wizard-avatar-btn:active{animation-duration:.4s;}
+.wizard-avatar{
+  width:92px; height:92px;
+  border-radius:50%;
+  object-fit:cover;
+  display:block;
+  border:3px solid var(--accent-gold);
+  animation:avatarGlow 2.6s ease-in-out infinite;
+}
+.wizard-label{
+  font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.06em;
+  color:var(--ink-soft); text-align:center; margin:0;
+}
+.wizard-socials{display:flex; gap:8px;}
+.social-btn{
+  width:32px; height:32px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; box-shadow:0 3px 10px rgba(0,0,0,.4);
+  transition:transform .15s ease;
+}
+.social-btn:hover{transform:translateY(-2px) scale(1.05);}
+.social-btn svg{width:16px; height:16px;}
+.social-btn.instagram{background:radial-gradient(circle at 30% 110%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);}
+.social-btn.telegram{background:#229ED9;}
+
+@keyframes wizardFloat{
+  0%,100%{transform:translateY(0) rotate(0deg);}
+  50%{transform:translateY(-6px) rotate(-1.5deg);}
+}
+@keyframes avatarGlow{
+  0%,100%{box-shadow:0 0 0 4px rgba(232,184,75,.15), 0 0 18px 2px rgba(111,168,220,.28);}
+  50%{box-shadow:0 0 0 4px rgba(232,184,75,.32), 0 0 30px 6px rgba(111,168,220,.45);}
+}
+
+.magic-sparkle{
+  position:fixed;
+  width:6px; height:6px;
+  border-radius:50%;
+  background:var(--accent-gold);
+  box-shadow:0 0 6px 1px var(--accent-gold);
+  pointer-events:none;
+  z-index:600;
+  animation:sparkleBurst .9s ease-out forwards;
+}
+@keyframes sparkleBurst{
+  0%{transform:translate(0,0) scale(1); opacity:1;}
+  100%{transform:translate(var(--dx), var(--dy)) scale(0); opacity:0;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .wizard-avatar-btn, .wizard-avatar{animation:none !important;}
+}
+@media (max-width:480px){
+  .wizard-corner{right:10px; bottom:10px; gap:6px;}
+  .wizard-avatar{width:72px; height:72px;}
+  .social-btn{width:28px; height:28px;}
+  .social-btn svg{width:14px; height:14px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="toast" id="toast"></div>
+
+<div class="wizard-corner">
+  <button class="wizard-avatar-btn" id="wizard-avatar-btn" title="Toque pra uma faísca de sorte nos estudos" aria-label="Mago dos Estudos, toque para uma animação">
+    <img class="wizard-avatar" src="data:image/jpeg;base64,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" alt="Mago dos Estudos">
+  </button>
+  <p class="wizard-label">Mago dos Estudos</p>
+  <div class="wizard-socials">
+    <a class="social-btn instagram" href="https://www.instagram.com/magodoestudos?igsh=c2N5c2dkbDd0MTBm" target="_blank" rel="noopener noreferrer" aria-label="Instagram do Mago dos Estudos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
+    </a>
+    <a class="social-btn telegram" href="https://t.me/+MiCygg5A-Cg5Y2Rh" target="_blank" rel="noopener noreferrer" aria-label="Telegram do Mago dos Estudos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" x2="11" y1="2" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </a>
+  </div>
+</div>
+
+<script>
+const WEEKDAYS = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+const WEEKDAYS_SHORT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const DAY_ORDER = [1,2,3,4,5,6,0]; // Seg..Dom display order
+const SUBJECT_COLORS = ['#2F6F5E','#C1443C','#3D5A80','#8E5572','#B4890E','#4C6444','#6B4F9E','#1D6E88'];
+
+let state = {
+  step: 0,
+  subjects: [],
+  studyDaySet: new Set([0,1,2,3,4,5,6]),
+  hoursPerDay: 2,
+  sessionLength: 50,
+  customSession: false,
+  examDate: '',
+  schedule: null // {studyDates:[{key,date,weekday}], dayFill:{}, daySessions:{}, skipped:{}}
+};
+
+function uid(){return 'id'+Math.random().toString(36).slice(2,9);}
+
+function formatKey(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function formatShort(d){
+  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
+}
+function isSameDay(a,b){return formatKey(a)===formatKey(b);}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+/* ---------- ARMAZENAMENTO (funciona no Claude.ai e também como arquivo local) ---------- */
+async function storageGet(key){
+  if(typeof window.storage !== 'undefined'){
+    try{ return await window.storage.get(key, false); }catch(e){ /* cai pro localStorage */ }
+  }
+  try{
+    const v = localStorage.getItem(key);
+    return v!==null ? {key, value:v} : null;
+  }catch(e){ return null; }
+}
+async function storageSet(key, value){
+  if(typeof window.storage !== 'undefined'){
+    try{ return await window.storage.set(key, value, false); }catch(e){ /* cai pro localStorage */ }
+  }
+  try{ localStorage.setItem(key, value); return {key, value}; }catch(e){ return null; }
+}
+async function storageDelete(key){
+  if(typeof window.storage !== 'undefined'){
+    try{ return await window.storage.delete(key, false); }catch(e){ /* cai pro localStorage */ }
+  }
+  try{ localStorage.removeItem(key); return {key, deleted:true}; }catch(e){ return null; }
+}
+
+async function persist(){
+  try{
+    await storageSet('cronograma-state', JSON.stringify({
+      subjects: state.subjects,
+      studyDaySet: Array.from(state.studyDaySet),
+      hoursPerDay: state.hoursPerDay,
+      sessionLength: state.sessionLength,
+      customSession: state.customSession,
+      examDate: state.examDate,
+      schedule: state.schedule ? {
+        studyDates: state.schedule.studyDates,
+        dayFill: state.schedule.dayFill,
+        daySessions: state.schedule.daySessions,
+        skipped: state.schedule.skipped
+      } : null,
+      step: state.step
+    }), false);
+  }catch(e){ console.error('Falha ao salvar', e); }
+}
+
+async function loadPersisted(){
+  try{
+    const res = await storageGet('cronograma-state');
+    if(res && res.value){
+      const d = JSON.parse(res.value);
+      state.subjects = d.subjects || [];
+      state.studyDaySet = new Set(d.studyDaySet || [0,1,2,3,4,5,6]);
+      state.hoursPerDay = d.hoursPerDay ?? 2;
+      state.sessionLength = d.sessionLength ?? 50;
+      state.customSession = d.customSession ?? false;
+      state.examDate = d.examDate || '';
+      state.schedule = d.schedule || null;
+      state.step = d.schedule ? 'schedule' : (d.step ?? 0);
+    }
+  }catch(e){ /* nada salvo ainda */ }
+
+  if(state.schedule && needsNewWeek(state.schedule) && state.subjects.length){
+    state.schedule = buildScheduleObject(new Date());
+    persist();
+    showToast('A semana anterior terminou — essa é a semana nova, com a carga normal de volta em todos os dias.');
+  }
+  render();
+}
+
+/* ---------- CRONÔMETRO ---------- */
+function getElapsedSeconds(block){
+  const base = block.elapsedSeconds || 0;
+  if(block.running && block.startTimestamp){
+    return base + (Date.now()-block.startTimestamp)/1000;
+  }
+  return base;
+}
+function formatTimer(totalSeconds){
+  const s = Math.max(0, Math.floor(totalSeconds));
+  const mm = String(Math.floor(s/60)).padStart(2,'0');
+  const ss = String(s%60).padStart(2,'0');
+  return mm+':'+ss;
+}
+function findBlockById(id){
+  if(!state.schedule) return null;
+  for(const key of Object.keys(state.schedule.daySessions)){
+    const found = state.schedule.daySessions[key].find(b=>b.id===id);
+    if(found) return found;
+  }
+  return null;
+}
+function toggleTimer(blockId){
+  const block = findBlockById(blockId);
+  if(!block || block.completed) return;
+  if(block.running){
+    block.elapsedSeconds = getElapsedSeconds(block);
+    block.running = false;
+    block.startTimestamp = null;
+  } else {
+    block.running = true;
+    block.startTimestamp = Date.now();
+  }
+  persist();
+  render();
+}
+function toggleComplete(blockId){
+  const block = findBlockById(blockId);
+  if(!block) return;
+  if(!block.completed){
+    block.elapsedSeconds = getElapsedSeconds(block);
+    block.running = false;
+    block.startTimestamp = null;
+    block.completed = true;
+  } else {
+    block.completed = false;
+  }
+  persist();
+  render();
+}
+function tickTimers(){
+  if(!state.schedule) return;
+  let anyRunning = false;
+  document.querySelectorAll('.timer-display').forEach(el=>{
+    const block = findBlockById(el.dataset.timerId);
+    if(block && block.running){
+      anyRunning = true;
+      el.textContent = formatTimer(getElapsedSeconds(block));
+      el.classList.toggle('goal-hit', getElapsedSeconds(block) >= block.minutes*60);
+    }
+  });
+}
+setInterval(tickTimers, 1000);
+
+function needsNewWeek(schedule){
+  if(!schedule.studyDates || schedule.studyDates.length===0) return false;
+  const lastKey = schedule.studyDates[schedule.studyDates.length-1].key;
+  const todayKey = formatKey(new Date());
+  return lastKey < todayKey;
+}
+
+/* ---------- GERAÇÃO DO CRONOGRAMA ---------- */
+
+function buildStudyDates(startDate){
+  const today = startDate ? new Date(startDate) : new Date();
+  today.setHours(0,0,0,0);
+  const dates = [];
+  for(let i=0;i<7;i++){
+    const d = new Date(today);
+    d.setDate(today.getDate()+i);
+    if(state.studyDaySet.has(d.getDay())){
+      dates.push({key:formatKey(d), date:d.toISOString(), weekday:d.getDay()});
+    }
+  }
+  return dates;
+}
+
+function buildScheduleObject(startDate){
+  const studyDates = buildStudyDates(startDate);
+  const capacityMinutes = state.hoursPerDay*60;
+  const totalWeeklyMinutes = capacityMinutes * studyDates.length;
+  const totalWeight = state.subjects.reduce((s,x)=>s+x.weight,0);
+
+  const subjectBlocksMap = {};
+  state.subjects.forEach(sub=>{
+    let total = Math.round(totalWeeklyMinutes*(sub.weight/totalWeight));
+    const blockLen = state.sessionLength;
+    const blocks = [];
+    let remaining = total;
+    while(remaining>0){
+      let size = Math.min(blockLen, remaining);
+      if(size < 15 && blocks.length>0){
+        blocks[blocks.length-1].minutes += size;
+        remaining = 0;
+      } else {
+        blocks.push({id:uid(), subjectId:sub.id, minutes:size, completed:false, elapsedSeconds:0, running:false, startTimestamp:null});
+        remaining -= size;
+      }
+    }
+    subjectBlocksMap[sub.id] = blocks;
+  });
+
+  // interleave por rodízio entre matérias
+  const order = state.subjects.map(s=>s.id);
+  const interleaved = [];
+  let any = true;
+  while(any){
+    any = false;
+    for(const id of order){
+      const q = subjectBlocksMap[id];
+      if(q && q.length){ interleaved.push(q.shift()); any = true; }
+    }
+  }
+
+  const dayFill = {}, daySessions = {}, skipped = {};
+  studyDates.forEach(d=>{dayFill[d.key]=0; daySessions[d.key]=[]; skipped[d.key]=false;});
+
+  interleaved.forEach(block=>{
+    let candidates = studyDates.filter(d=>dayFill[d.key] < capacityMinutes);
+    if(candidates.length===0) candidates = studyDates;
+    candidates.sort((a,b)=>dayFill[a.key]-dayFill[b.key]);
+    const chosen = candidates[0];
+    dayFill[chosen.key] += block.minutes;
+    daySessions[chosen.key].push(block);
+  });
+
+  return {studyDates, dayFill, daySessions, skipped};
+}
+
+function generateSchedule(){
+  state.schedule = buildScheduleObject(new Date());
+  state.step = 'schedule';
+  persist();
+}
+
+function skipAndRecalculate(dateKey){
+  const sch = state.schedule;
+  const pending = sch.daySessions[dateKey].slice();
+  if(pending.length===0){
+    sch.skipped[dateKey] = true;
+    render(); persist();
+    return;
+  }
+  sch.daySessions[dateKey] = [];
+  sch.dayFill[dateKey] = 0;
+  sch.skipped[dateKey] = true;
+
+  const todayKey = formatKey(new Date());
+  let targets = sch.studyDates.filter(d=> d.key!==dateKey && !sch.skipped[d.key] && d.key>=todayKey);
+  if(targets.length===0){
+    targets = sch.studyDates.filter(d=> d.key!==dateKey && !sch.skipped[d.key]);
+  }
+  if(targets.length===0){
+    showToast('Não há outros dias disponíveis para reorganizar essa carga — considere refazer o cronograma.');
+    render(); persist();
+    return;
+  }
+  pending.forEach(block=>{
+    targets.sort((a,b)=> sch.dayFill[a.key]-sch.dayFill[b.key]);
+    const chosen = targets[0];
+    sch.dayFill[chosen.key] += block.minutes;
+    sch.daySessions[chosen.key].push(block);
+  });
+  const totalMins = pending.reduce((s,b)=>s+b.minutes,0);
+  showToast(`Prontinho. Redistribuímos ${totalMins} min pelos outros dias.`);
+  render();
+  persist();
+}
+
+function resetAll(){
+  state = {
+    step:0, subjects:[], studyDaySet:new Set([0,1,2,3,4,5,6]),
+    hoursPerDay:2, sessionLength:50, customSession:false, examDate:'', schedule:null
+  };
+  storageDelete('cronograma-state').catch(()=>{});
+  render();
+}
+
+/* ---------- RENDER ---------- */
+
+function render(){
+  const app = document.getElementById('app');
+  if(state.step === 'schedule' && state.schedule){
+    app.innerHTML = renderSchedule();
+  } else {
+    app.innerHTML = renderWizard();
+  }
+  attachHandlers();
+}
+
+function progressBar(current,total){
+  let html = '<div class="progress">';
+  for(let i=0;i<total;i++){
+    html += `<span class="${i<=current?'done':''}"></span>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderWizard(){
+  const steps = ['intro','subjects','days','hours','session','exam','review'];
+  const s = steps[state.step] || 'intro';
+  let inner = '';
+
+  if(s==='intro'){
+    inner = `
+      <div class="header">
+        <div class="eyebrow">Cronograma de estudos</div>
+        <h1>Vamos montar seu plano da semana</h1>
+        <p>Responda algumas perguntas rápidas e eu distribuo suas matérias pelos dias que você escolher. Se um dia furar, é só me avisar aqui dentro que eu reorganizo tudo.</p>
+      </div>
+      <div class="card">
+        <h2 class="step-title">Antes de começar</h2>
+        <p class="step-help">Você vai me dizer: quais matérias quer estudar, em quais dias da semana, quantas horas por dia e o tamanho ideal de cada sessão. No final, se preferir, você marca a data de uma prova para acompanhar a contagem regressiva.</p>
+        <div class="actions"><span></span><button class="btn btn-primary" data-action="next">Começar →</button></div>
+      </div>`;
+  }
+
+  if(s==='subjects'){
+    inner = `
+      <div class="header">
+        <div class="eyebrow">Pergunta 1 de 5</div>
+        <h1>Quais matérias você quer estudar?</h1>
+        ${progressBar(0,5)}
+      </div>
+      <div class="card">
+        <h2 class="step-title">Matérias e prioridade</h2>
+        <p class="step-help">Adicione cada matéria ou assunto e diga o quanto ela é prioritária — isso define quanto tempo semanal ela recebe.</p>
+        <div class="subject-add">
+          <input type="text" id="subj-name" placeholder="Ex: Matemática, Direito Constitucional..." maxlength="40">
+          <select id="subj-weight">
+            <option value="1">Baixa prioridade</option>
+            <option value="2" selected>Média prioridade</option>
+            <option value="3">Alta prioridade</option>
+          </select>
+          <button class="btn btn-primary" data-action="add-subject">Adicionar</button>
+        </div>
+        <div class="subject-list">
+          ${state.subjects.length===0 ? '<div class="empty-hint">Nenhuma matéria adicionada ainda.</div>' :
+            state.subjects.map(s=>`
+              <div class="subject-item">
+                <span class="name">${escapeHtml(s.name)}</span>
+                <span class="meta">
+                  <span class="pill w${s.weight}">${s.weight===1?'Baixa':s.weight===2?'Média':'Alta'}</span>
+                  <button class="remove-x" data-action="remove-subject" data-id="${s.id}" aria-label="Remover">×</button>
+                </span>
+              </div>`).join('')}
+        </div>
+        <div class="actions">
+          <button class="btn btn-ghost" data-action="back">← Voltar</button>
+          <button class="btn btn-primary" data-action="next" ${state.subjects.length===0?'disabled':''}>Avançar →</button>
+        </div>
+      </div>`;
+  }
+
+  if(s==='days'){
+    inner = `
+      <div class="header">
+        <div class="eyebrow">Pergunta 2 de 5</div>
+        <h1>Em quais dias você quer estudar?</h1>
+        ${progressBar(1,5)}
+      </div>
+      <div class="card">
+        <h2 class="step-title">Dias da semana</h2>
+        <p class="step-help">Por padrão todos os dias estão marcados. Toque para desativar os dias que você não quer estudar.</p>
+        <div class="days-grid">
+          ${DAY_ORDER.map(idx=>`
+            <button class="day-toggle ${state.studyDaySet.has(idx)?'active':''}" data-action="toggle-day" data-day="${idx}">${WEEKDAYS_SHORT[idx]}</button>
+          `).join('')}
+        </div>
+        <div class="actions">
+          <button class="btn btn-ghost" data-action="back">← Voltar</button>
+          <button class="btn btn-primary" data-action="next" ${state.studyDaySet.size===0?'disabled':''}>Avançar →</button>
+        </div>
+      </div>`;
+  }
+
+  if(s==='hours'){
+    inner = `
+      <div class="header">
+        <div class="eyebrow">Pergunta 3 de 5</div>
+        <h1>Quantas horas por dia você tem disponível?</h1>
+        ${progressBar(2,5)}
+      </div>
+      <div class="card">
+        <h2 class="step-title">Horas de estudo por dia</h2>
+        <p class="step-help">Considere um valor realista para os dias que você marcou — dá pra ajustar depois.</p>
+        <div class="slider-row">
+          <input type="range" id="hours-slider" min="0.5" max="8" step="0.5" value="${state.hoursPerDay}">
+          <span class="slider-value" id="hours-value">${state.hoursPerDay} h/dia</span>
+        </div>
+        <div class="actions">
+          <button class="btn btn-ghost" data-action="back">← Voltar</button>
+          <button class="btn btn-primary" data-action="next">Avançar →</button>
+        </div>
+      </div>`;
+  }
+
+  if(s==='session'){
+    const opts = [25,50,90];
+    inner = `
+      <div class="header">
+        <div class="eyebrow">Pergunta 4 de 5</div>
+        <h1>Qual o tamanho ideal de cada sessão?</h1>
+        ${progressBar(3,5)}
+      </div>
+      <div class="card">
+        <h2 class="step-title">Duração dos blocos de estudo</h2>
+        <p class="step-help">Cada matéria será dividida em blocos desse tamanho ao longo da semana.</p>
+        <div class="chip-options">
+          ${opts.map(o=>`<button class="chip-opt ${!state.customSession && state.sessionLength===o?'active':''}" data-action="set-session" data-len="${o}">${o} min</button>`).join('')}
+          <button class="chip-opt ${state.customSession?'active':''}" data-action="set-session-custom">Personalizado</button>
+        </div>
+        ${state.customSession?`<div style="margin-top:14px;"><input type="number" id="custom-session-input" min="10" max="240" value="${state.sessionLength}" placeholder="Minutos"></div>`:''}
+        <div class="actions">
+          <button class="btn btn-ghost" data-action="back">← Voltar</button>
+          <button class="btn btn-primary" data-action="next">Avançar →</button>
+        </div>
+      </div>`;
+  }
+
+  if(s==='exam'){
+    inner = `
+      <div class="header">
+        <div class="eyebrow">Pergunta 5 de 5</div>
+        <h1>Tem alguma prova ou prazo em vista?</h1>
+        ${progressBar(4,5)}
+      </div>
+      <div class="card">
+        <h2 class="step-title">Data-alvo (opcional)</h2>
+        <p class="step-help">Se você tiver uma data de prova, eu mostro a contagem regressiva no topo do seu cronograma.</p>
+        <input type="date" id="exam-date" value="${state.examDate}">
+        <div class="actions">
+          <button class="btn btn-ghost" data-action="back">← Voltar</button>
+          <button class="btn btn-primary" data-action="next">Avançar →</button>
+        </div>
+      </div>`;
+  }
+
+  if(s==='review'){
+    const dayNames = DAY_ORDER.filter(i=>state.studyDaySet.has(i)).map(i=>WEEKDAYS_SHORT[i]).join(', ');
+    inner = `
+      <div class="header">
+        <div class="eyebrow">Revisão</div>
+        <h1>Confere se está tudo certo</h1>
+      </div>
+      <div class="card">
+        <h2 class="step-title">Resumo</h2>
+        <p class="step-help"><strong>${state.subjects.length}</strong> matéria(s) · dias: <strong>${dayNames}</strong> · <strong>${state.hoursPerDay}h</strong>/dia · blocos de <strong>${state.sessionLength} min</strong>${state.examDate?` · prova em <strong>${formatShort(new Date(state.examDate+'T00:00:00'))}</strong>`:''}</p>
+        <div class="actions">
+          <button class="btn btn-ghost" data-action="back">← Voltar</button>
+          <button class="btn btn-primary" data-action="generate">Gerar cronograma →</button>
+        </div>
+      </div>`;
+  }
+
+  return inner;
+}
+
+function renderSchedule(){
+  const sch = state.schedule;
+  const todayKey = formatKey(new Date());
+  let examBanner = '';
+  if(state.examDate){
+    const exam = new Date(state.examDate+'T00:00:00');
+    const diffDays = Math.ceil((exam - new Date(new Date().toDateString())) / 86400000);
+    examBanner = `<div class="exam">Prova em ${formatShort(exam)} <strong>${diffDays>=0? '· faltam '+diffDays+' dia(s)' : '· já passou'}</strong></div>`;
+  }
+
+  const dayCards = sch.studyDates.map(d=>{
+    const date = new Date(d.date);
+    const isToday = d.key===todayKey;
+    const sessions = sch.daySessions[d.key];
+    const skipped = sch.skipped[d.key];
+    const totalMin = sch.dayFill[d.key];
+    return `
+      <div class="day-card ${skipped?'skipped':''}">
+        <div class="day-card-head">
+          <span class="wd">${WEEKDAYS_SHORT[d.weekday]} ${isToday?'<span class=\"today-tag\">HOJE</span>':''}</span>
+          <span class="dt">${formatShort(date)}</span>
+        </div>
+        <div class="sessions">
+          ${sessions.length===0 ? '<div class="no-session">Sem sessões neste dia.</div>' :
+            sessions.map(sess=>{
+              const subj = state.subjects.find(s=>s.id===sess.subjectId);
+              const color = subj ? subjectColor(subj.id) : '#999';
+              return `
+                <div class="session ${sess.completed?'completed':''}" style="border-left-color:${color}">
+                  <div class="session-top">
+                    <span class="session-name">${subj?escapeHtml(subj.name):'—'}</span>
+                    <span class="mins">${sess.minutes} min</span>
+                  </div>
+                  <div class="session-timer">
+                    <span class="timer-display ${getElapsedSeconds(sess)>=sess.minutes*60?'goal-hit':''}" data-timer-id="${sess.id}">${formatTimer(getElapsedSeconds(sess))}</span>
+                    <button class="timer-btn" data-action="toggle-timer" data-id="${sess.id}" ${sess.completed?'disabled':''} aria-label="${sess.running?'Pausar':'Iniciar'} cronômetro">${sess.running?'⏸':'▶'}</button>
+                    <button class="timer-btn complete-btn ${sess.completed?'is-done':''}" data-action="toggle-complete" data-id="${sess.id}" aria-label="${sess.completed?'Reabrir sessão':'Marcar como concluída'}">${sess.completed?'↺':'✓'}</button>
+                  </div>
+                </div>`;
+            }).join('')}
+        </div>
+        <div class="day-total">${skipped? 'Marcado como pulado' : `Total: ${totalMin} min (${(totalMin/60).toFixed(1)}h)`}</div>
+        ${skipped? '' : `<div class="day-actions"><button class="btn btn-danger btn-small" data-action="skip-day" data-key="${d.key}">Pulei esse dia</button></div>`}
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="header">
+      <div class="eyebrow">Seu cronograma</div>
+      <h1>Semana de estudos</h1>
+      <p>Se furar algum dia, clique em "Pulei esse dia" no card correspondente — eu redistribuo o conteúdo pelos dias que restam. Quando terminar a semana, clique em "Concluir semana" pra começar a próxima do zero.</p>
+    </div>
+    <div class="board-banner">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--accent-gold); letter-spacing:.08em;">SEMANA DE ${formatShort(new Date(sch.studyDates[0].date))} A ${formatShort(new Date(sch.studyDates[sch.studyDates.length-1].date))}</div>
+        <strong style="font-family:'Fraunces',serif; font-size:20px;">${(Object.values(sch.dayFill).reduce((a,b)=>a+b,0)/60).toFixed(1)} horas planejadas</strong>
+      </div>
+      ${examBanner}
+    </div>
+    <div class="week-grid">${dayCards}</div>
+    <div class="bottom-actions">
+      <button class="btn btn-ghost" data-action="reset">Refazer do zero</button>
+      <button class="btn btn-primary" data-action="conclude-week">Concluir semana →</button>
+    </div>
+  `;
+}
+
+function subjectColor(id){
+  const idx = state.subjects.findIndex(s=>s.id===id);
+  return SUBJECT_COLORS[idx % SUBJECT_COLORS.length];
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* ---------- HANDLERS ---------- */
+
+function attachHandlers(){
+  document.querySelectorAll('[data-action]').forEach(el=>{
+    el.addEventListener('click', onAction);
+  });
+  const hoursSlider = document.getElementById('hours-slider');
+  if(hoursSlider){
+    hoursSlider.addEventListener('input', e=>{
+      state.hoursPerDay = parseFloat(e.target.value);
+      document.getElementById('hours-value').textContent = state.hoursPerDay+' h/dia';
+    });
+  }
+  const customInput = document.getElementById('custom-session-input');
+  if(customInput){
+    customInput.addEventListener('input', e=>{
+      const v = parseInt(e.target.value)||50;
+      state.sessionLength = Math.max(10, Math.min(240, v));
+    });
+  }
+  const examInput = document.getElementById('exam-date');
+  if(examInput){
+    examInput.addEventListener('change', e=>{ state.examDate = e.target.value; });
+  }
+  const subjName = document.getElementById('subj-name');
+  if(subjName){
+    subjName.addEventListener('keydown', e=>{
+      if(e.key==='Enter'){ e.preventDefault(); addSubjectFromInputs(); }
+    });
+  }
+}
+
+function addSubjectFromInputs(){
+  const nameEl = document.getElementById('subj-name');
+  const weightEl = document.getElementById('subj-weight');
+  const name = nameEl.value.trim();
+  if(!name) return;
+  state.subjects.push({id:uid(), name, weight:parseInt(weightEl.value)});
+  nameEl.value='';
+  render();
+}
+
+function onAction(e){
+  const action = e.currentTarget.dataset.action;
+  const steps = ['intro','subjects','days','hours','session','exam','review'];
+  const currentIdx = typeof state.step === 'number' ? state.step : steps.length-1;
+
+  switch(action){
+    case 'next':
+      state.step = currentIdx+1;
+      persist(); render();
+      break;
+    case 'back':
+      state.step = Math.max(0, currentIdx-1);
+      persist(); render();
+      break;
+    case 'add-subject':
+      addSubjectFromInputs();
+      break;
+    case 'remove-subject':
+      state.subjects = state.subjects.filter(s=>s.id!==e.currentTarget.dataset.id);
+      render();
+      break;
+    case 'toggle-day':{
+      const d = parseInt(e.currentTarget.dataset.day);
+      if(state.studyDaySet.has(d)) state.studyDaySet.delete(d); else state.studyDaySet.add(d);
+      render();
+      break;
+    }
+    case 'set-session':
+      state.sessionLength = parseInt(e.currentTarget.dataset.len);
+      state.customSession = false;
+      render();
+      break;
+    case 'set-session-custom':
+      state.customSession = true;
+      render();
+      break;
+    case 'generate':
+      generateSchedule();
+      render();
+      break;
+    case 'toggle-timer':
+      toggleTimer(e.currentTarget.dataset.id);
+      break;
+    case 'toggle-complete':
+      toggleComplete(e.currentTarget.dataset.id);
+      break;
+    case 'skip-day':
+      skipAndRecalculate(e.currentTarget.dataset.key);
+      break;
+    case 'conclude-week':
+      generateSchedule();
+      render();
+      showToast('Semana concluída! Uma nova semana já foi gerada com as mesmas matérias e configurações.');
+      break;
+    case 'reset':
+      if(confirm('Isso vai apagar seu cronograma atual e as respostas. Deseja continuar?')){
+        resetAll();
+      }
+      break;
+  }
+}
+
+/* ---------- MAGO DECORATIVO: interação ---------- */
+function spawnSparkles(x, y){
+  const count = 14;
+  for(let i=0;i<count;i++){
+    const el = document.createElement('div');
+    el.className = 'magic-sparkle';
+    const angle = (Math.PI*2*i/count) + Math.random()*0.5;
+    const dist = 40 + Math.random()*50;
+    el.style.left = x+'px';
+    el.style.top = y+'px';
+    el.style.setProperty('--dx', Math.cos(angle)*dist+'px');
+    el.style.setProperty('--dy', Math.sin(angle)*dist+'px');
+    el.style.background = i%3===0 ? '#EAF3FF' : '#E8B84B';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 950);
+  }
+}
+
+function initWizard(){
+  const wizard = document.getElementById('wizard-avatar-btn');
+  if(!wizard) return;
+  const messages = [
+    'Abracadabra! Bora estudar ✨',
+    'Foco total ativado 🔮',
+    'Uma pitada de sorte pra sua semana',
+    'Concentração +10 nível místico'
+  ];
+  wizard.addEventListener('click', (e)=>{
+    const rect = wizard.getBoundingClientRect();
+    spawnSparkles(rect.left+rect.width*0.5, rect.top+rect.height*0.15);
+    showToast(messages[Math.floor(Math.random()*messages.length)]);
+  });
+}
+
+initWizard();
+loadPersisted();
+</script>
+</body>
+</html>
